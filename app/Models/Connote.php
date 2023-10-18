@@ -48,10 +48,10 @@ class Connote extends Model
     ];
 
     public function package(){
-        return $this->belongsTo(Package::class);
+        return $this->belongsTo(Package::class,"transaction_id","transaction_id");
     }
 
     public function koli(){
-        return $this->hasMany(Koli::class);
+        return $this->hasMany(Koli::class,"connote_id","connote_id");
     }
 }

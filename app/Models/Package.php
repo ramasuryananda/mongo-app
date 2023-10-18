@@ -30,7 +30,6 @@ class Package extends Model
         "transaction_cash_amount",
         "transaction_cash_change",
         "customer_attribute",
-        "connote_id",
         "origin_data",
         "destination_data",
         "koli_data",
@@ -39,6 +38,6 @@ class Package extends Model
     ];
 
     public function connote(){
-        return $this->hasOne(Connote::class);
+        return $this->hasOne(Connote::class,"transaction_id","transaction_id");
     }
 }

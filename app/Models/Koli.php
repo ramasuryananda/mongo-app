@@ -31,6 +31,6 @@ class Koli extends Model
     ];
 
     public function connote(){
-        return $this->belongsTo(Connote::class);
+        return $this->belongsTo(Connote::class,"connote_id","connote_id");
     }
 }
