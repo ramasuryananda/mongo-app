@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use MongoDB\Laravel\Eloquent\Model;
-
+use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 class Package extends Model
 {
-    use HasFactory,HasUuids;
+    use HasFactory,HasUuids,SoftDeletes;
     protected $connection = "mongodb";
     protected $collection = "packages";
     protected $primaryKey = "transaction_id";
 
     const STATE = [
-        0 => "PENDING",
-        1 => "FAILED",
-        2 => "PAID"
+        0 => "FAILED",
+        1 => "PENDING",
+        2 => "PAID",
+        3 => "SUCCESS"
     ];
 
     public $fillable = [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Package;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
@@ -21,6 +22,9 @@ class StoreRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        $transactionState = implode(",",array_keys(Package::STATE));
+        
         $rules = [
             "customer_name" => 'required|min:1',
             "customer_code"=> 'required|min:1',
@@ -28,7 +32,7 @@ class StoreRequest extends FormRequest
             "transaction_discount" => 'required',
             "transaction_additional_field" => 'nullable',
             "transaction_payment_type" => 'required|numeric',
-            "transaction_state" => 'required|numeric',
+            "transaction_state" => "required|numeric|in:$transactionState",
             "location_id" => 'required|string',
             "organization_id" => 'required|numeric',
             "transaction_payment_type_name" => 'required|string',
@@ -38,7 +42,7 @@ class StoreRequest extends FormRequest
             "customer_attribute.Nama_Sales" => "required|string",
             "customer_attribute.TOP" => 'required|string',
             "customer_attribute.Jenis_Pelanggan" => 'required|string',
-            "connote" => "required",
+            "connote" => "required|array",
             "connote.connote_number" => 'required|numeric',
             "connote.connote_service" => 'required|string',
             "connote.connote_booking_code" => 'nullable|string',
@@ -58,7 +62,7 @@ class StoreRequest extends FormRequest
             "connote.location_type" => 'required|string',
             "connote.pod" => 'nullable',
             "connote.history" => 'nullable|array',
-            "origin_data" => 'required',
+            "origin_data" => 'required|array',
             "origin_data.customer_name"=> 'required|string',
             "origin_data.customer_address"=> 'required|string',
             "origin_data.customer_email"=> 'nullable|string|email',
@@ -66,7 +70,7 @@ class StoreRequest extends FormRequest
             "origin_data.customer_zip_code"=> 'required|string',
             "origin_data.zone_code"=> 'required|string',
             "origin_data.customer_address_detail"=> 'nullable',
-            "destination_data" => 'required',
+            "destination_data" => 'required|array',
             "destination_data.customer_name"=> 'required|string',
             "destination_data.customer_address"=> 'required|string',
             "destination_data.customer_email"=> 'nullable|string|email',
@@ -75,7 +79,7 @@ class StoreRequest extends FormRequest
             "destination_data.zone_code"=> 'required|string',
             "destination_data.customer_address_detail"=> 'nullable',
             "koli_data" => "nullable|array",
-            "koli_data.*" => 'nullable',
+            "koli_data.*" => 'nullable|array',
             "koli_data.*.koli_length" => 'required|numeric',
             "koli_data.*.awb_url" => 'required|string',
             "koli_data.*.koli_chargeable_weight" => 'required|numeric',

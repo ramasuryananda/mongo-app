@@ -42,4 +42,12 @@ class ConnoteRepository
         ]);
         return $connoteData;
     }
+
+    function updateFromTransaction(array $data, String $transactionId):bool{
+        return Connote::where("transaction_id",$transactionId)->update([
+            "location_id" => $data["location_id"],
+            "connote_state_id" => $data["connote_state_id"],
+            "location_name" => $data["location_name"]
+        ]);
+    }
 }

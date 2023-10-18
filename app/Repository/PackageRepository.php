@@ -51,6 +51,14 @@ class PackageRepository
 
     function getCount():int
     {
-        return Package::count();
+        return Package::withTrashed()->count();
+    }
+
+    function update(array $data, String $id):bool{
+        return Package::findOrFail($id)->update([
+            "transaction_state" => $data["transaction_state"],
+            "location_id" => $data["location_id"],
+            "currentLocation" => $data["currentLocation"]
+        ]);
     }
 }

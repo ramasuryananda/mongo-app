@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GetDataRequest;
 use App\Http\Requests\StoreRequest;
+use App\Http\Requests\UpdateRequest;
 use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use App\Services\PackageService;
@@ -35,7 +36,8 @@ class PackageController extends Controller
                 data:$data
             );
         } catch (\Throwable $th) {
-            Log::error("failed get data: $th->getMessage");
+            $errorMessage = $th->getMessage();
+            Log::error("failed get data: $errorMessage");
             return $this->responseError(
                 message:'Failed getting packages',
                 error:'some error occurs'
@@ -58,7 +60,8 @@ class PackageController extends Controller
             );
         } 
         catch (\Throwable $th) {
-            Log::error("failed delete data: $th->getMessage");
+            $errorMessage = $th->getMessage();
+            Log::error("failed get data: $errorMessage");
             return $this->responseError(
                 message:"Failed getting package",
                 error:"Some error occurs",
@@ -75,8 +78,10 @@ class PackageController extends Controller
                 data:$data,
                 code:Response::HTTP_CREATED
             );
-        } catch (\Throwable $th) {
-            Log::error("failed get data: $th->getMessage");
+        } 
+        catch (\Throwable $th) {
+            $errorMessage = $th->getMessage();
+            Log::error("failed store data: $errorMessage");
             return $this->responseError(
                 message:'Failed inserting pacckage',
                 error:'some error occurs'
@@ -84,8 +89,29 @@ class PackageController extends Controller
         }
     }
 
-    public function update($request, String $id){
-
+    public function update(UpdateRequest $request, String $id){
+        try {
+            $data = (new PackageResource($this->service->update($request->validated(),$id)));
+            return $this->responseSuccess(
+                message:'Success updateing data',
+                data:$data
+            );
+        } catch(ModelNotFoundException $e){
+            return $this->responseError(
+                message:"Failed updating package",
+                error:"Package not found",
+                code:Response::HTTP_NOT_FOUND
+            );
+        } 
+        catch (\Throwable $th) {
+            $errorMessage = $th->getMessage();
+            Log::error("failed update data: $errorMessage");
+            return $this->responseError(
+                message:"Failed updating package",
+                error:"Some error occurs",
+                code:Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function replace($request, String $id){
@@ -109,7 +135,8 @@ class PackageController extends Controller
             );
         } 
         catch (\Throwable $th) {
-            Log::error("failed delete data: $th->getMessage");
+            $errorMessage = $th->getMessage();
+            Log::error("failed delete data: $errorMessage");
             return $this->responseError(
                 message:"Failed deleting package",
                 error:"Some error occurs",

@@ -38,7 +38,6 @@ class PackageService
         $state = $requestData["transaction_state"];
 
         $orderCount = $this->packageRepository->getCount()+1;
-
         $transactionCode = $requestData["origin_data"]["zone_code"].Carbon::now()->format("Ymd").$orderCount;
 
         $packageData = $this->packageRepository->store([
@@ -82,7 +81,7 @@ class PackageService
             "actual_weight" => $requestData["connote"]["actual_weight"],
             "volume_weight" => $requestData["connote"]["volume_weight"],
             "chargeable_weight" => $requestData["connote"]["chargeable_weight"],
-            "organization_id" => $requestData["connote"]["organization_id"],
+            "organization_id" => $requestData["organization_id"],
             "location_id" => $requestData["location_id"],
             "connote_total_package" => $requestData["connote"]["connote_total_package"],
             "connote_surcharge_amount" => $requestData["connote"]["connote_surcharge_amount"],
@@ -114,6 +113,22 @@ class PackageService
             ]);
         }
         return $packageData;
+    }
+
+    function update(array $data,String $id): Package{
+        $this->packageRepository->update([
+            "transaction_state" => $data["transaction_state"],
+            "location_id" => $data["location_id"],
+            "currentLocation" => $data["currentLocation"]
+        ],$id);
+        
+        $this->connoteRepository->updateFromTransaction([
+            "location_id" => $data["location_id"],
+            "connote_state_id" => $data["transaction_state"],
+            "location_name" => $data["currentLocation"]["name"]
+        ],$id);
+
+        return $this->packageRepository->getByTransId($id);
     }
 
     function getData(?int $offset, ?int $limit):Collection{
