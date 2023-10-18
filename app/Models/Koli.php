@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model as EloquentModel;
 
-class Koli extends Model
+class Koli extends EloquentModel
 {
     use HasFactory,HasUuids;
     protected $connection = "mongodb";
@@ -16,7 +17,6 @@ class Koli extends Model
     public $fillable = [
         "koli_length",
         "awb_url",
-        "created_at",
         "koli_chargeable_weight",
         "koli_width",
         "koli_surcharge",

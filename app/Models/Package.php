@@ -18,7 +18,6 @@ class Package extends Model
         "customer_name",
         "transaction_amount",
         "transaction_discount",
-        "transaction_discount",
         "transaction_additional_field",
         "transaction_payment_type",
         "transaction_state",
@@ -32,7 +31,6 @@ class Package extends Model
         "customer_attribute",
         "origin_data",
         "destination_data",
-        "koli_data",
         "custom_field",
         "currentLocation"
     ];
