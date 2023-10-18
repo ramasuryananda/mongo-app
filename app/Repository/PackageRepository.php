@@ -45,6 +45,10 @@ class PackageRepository
         return Package::with(["connote.koli"])->findOrFail($id);
     }
 
+    function deleteByTransId(String $id){
+        return Package::findOrFail($id)->delete();
+    }
+
     function getCount():int
     {
         return Package::count();

@@ -35,89 +35,85 @@ class PackageService
 
     function Store(array $requestData): Package
     {
-        try {
-            $state = $requestData["transaction_state"];
+        $state = $requestData["transaction_state"];
 
-            $orderCount = $this->packageRepository->getCount()+1;
+        $orderCount = $this->packageRepository->getCount()+1;
 
-            $transactionCode = $requestData["origin_data"]["zone_code"].Carbon::now()->format("Ymd").$orderCount;
+        $transactionCode = $requestData["origin_data"]["zone_code"].Carbon::now()->format("Ymd").$orderCount;
 
-            $packageData = $this->packageRepository->store([
-                "customer_name" => $requestData["customer_name"],
-                "customer_code" => $requestData["customer_code"],
-                "transaction_amount" => $requestData["transaction_amount"],
-                "transaction_discount" => $requestData["transaction_discount"],
-                "transaction_additional_field" => $requestData["transaction_additional_field"],
-                "transaction_payment_type" => $requestData["transaction_payment_type"],
-                "transaction_state" => $state,
-                "transaction_code" => $transactionCode,
-                "transaction_order" => $orderCount,
-                "location_id" => $requestData["location_id"],
-                "organization_id" => $requestData["organization_id"],
-                "transaction_payment_type_name" => $requestData["transaction_payment_type_name"],
-                "transaction_cash_amount" => $requestData["transaction_cash_amount"],
-                "transaction_cash_change" => $requestData["transaction_cash_change"],
-                "customer_attribute" => $requestData["customer_attribute"],
-                "origin_data" => $requestData["origin_data"],
-                "destination_data" => $requestData["destination_data"],
-                "custom_field" => $requestData["custom_field"],
-                "currentLocation" => $requestData["currentLocation"],
+        $packageData = $this->packageRepository->store([
+            "customer_name" => $requestData["customer_name"],
+            "customer_code" => $requestData["customer_code"],
+            "transaction_amount" => $requestData["transaction_amount"],
+            "transaction_discount" => $requestData["transaction_discount"],
+            "transaction_additional_field" => $requestData["transaction_additional_field"],
+            "transaction_payment_type" => $requestData["transaction_payment_type"],
+            "transaction_state" => $state,
+            "transaction_code" => $transactionCode,
+            "transaction_order" => $orderCount,
+            "location_id" => $requestData["location_id"],
+            "organization_id" => $requestData["organization_id"],
+            "transaction_payment_type_name" => $requestData["transaction_payment_type_name"],
+            "transaction_cash_amount" => $requestData["transaction_cash_amount"],
+            "transaction_cash_change" => $requestData["transaction_cash_change"],
+            "customer_attribute" => $requestData["customer_attribute"],
+            "origin_data" => $requestData["origin_data"],
+            "destination_data" => $requestData["destination_data"],
+            "custom_field" => $requestData["custom_field"],
+            "currentLocation" => $requestData["currentLocation"],
+        ]);
+
+        $serviceAmount = intval($requestData["transaction_amount"]);
+        $serviceDiscount = intval($requestData["transaction_discount"]);
+        $totalAmount = $serviceAmount-$serviceDiscount;
+
+        $connoteData = $this->connoteRepository->store([
+            "connote_number" => $requestData["connote"]["connote_number"],
+            "connote_service" => $requestData["connote"]["connote_service"],
+            "connote_service_price" => $serviceAmount,
+            "connote_amount" => $totalAmount,
+            "connote_code" => "AWB00010002".Carbon::now()->format("dmY").(Connote::count()+1),
+            "connote_booking_code" => $requestData["connote"]["connote_booking_code"],
+            "connote_order" => $requestData["connote"]["connote_order"],
+            "connote_state_id" => $state,
+            "zone_code_from" => $requestData["origin_data"]["zone_code"],
+            "zone_code_to" => $requestData["destination_data"]["zone_code"],
+            "transaction_id" => $packageData->transaction_id,
+            "actual_weight" => $requestData["connote"]["actual_weight"],
+            "volume_weight" => $requestData["connote"]["volume_weight"],
+            "chargeable_weight" => $requestData["connote"]["chargeable_weight"],
+            "organization_id" => $requestData["connote"]["organization_id"],
+            "location_id" => $requestData["location_id"],
+            "connote_total_package" => $requestData["connote"]["connote_total_package"],
+            "connote_surcharge_amount" => $requestData["connote"]["connote_surcharge_amount"],
+            "connote_sla_day" => $requestData["connote"]["connote_sla_day"],
+            "location_name" => $requestData["connote"]["location_name"],
+            "location_type" => $requestData["connote"]["location_type"],
+            "source_tariff_db" => $requestData["connote"]["source_tariff_db"],
+            "id_source_tariff" => $requestData["connote"]["id_source_tariff"],
+            "pod" => $requestData["connote"]["pod"],
+            "history" => $requestData["connote"]["history"],
+        ]);
+        $count = 0;
+        foreach ($requestData["koli_data"] as $key => $koli) {
+            $count++;
+            $this->koliRepository->store([
+                "koli_length" => $koli["koli_length"],
+                "awb_url" => $koli["awb_url"],
+                "koli_chargeable_weight" => $koli["koli_chargeable_weight"],
+                "koli_width" => $koli["koli_width"],
+                "koli_surcharge" => $koli["koli_surcharge"],
+                "koli_height" => $koli["koli_height"],
+                "koli_description" => $koli["koli_description"],
+                "koli_formula_id" => $koli["koli_formula_id"],
+                "connote_id" => $connoteData->connote_id,
+                "koli_volume" => $koli["koli_volume"],
+                "koli_weight" => $koli["koli_weight"],
+                "koli_custom_field" => $koli["koli_custom_field"],
+                "koli_code" => $connoteData->connote_code.".$count",
             ]);
-
-            $serviceAmount = intval($requestData["transaction_amount"]);
-            $serviceDiscount = intval($requestData["transaction_discount"]);
-            $totalAmount = $serviceAmount-$serviceDiscount;
-
-            $connoteData = $this->connoteRepository->store([
-                "connote_number" => $requestData["connote"]["connote_number"],
-                "connote_service" => $requestData["connote"]["connote_service"],
-                "connote_service_price" => $serviceAmount,
-                "connote_amount" => $totalAmount,
-                "connote_code" => "AWB00010002".Carbon::now()->format("dmY").(Connote::count()+1),
-                "connote_booking_code" => $requestData["connote"]["connote_booking_code"],
-                "connote_order" => $requestData["connote"]["connote_order"],
-                "connote_state_id" => $state,
-                "zone_code_from" => $requestData["origin_data"]["zone_code"],
-                "zone_code_to" => $requestData["destination_data"]["zone_code"],
-                "transaction_id" => $packageData->transaction_id,
-                "actual_weight" => $requestData["connote"]["actual_weight"],
-                "volume_weight" => $requestData["connote"]["volume_weight"],
-                "chargeable_weight" => $requestData["connote"]["chargeable_weight"],
-                "organization_id" => $requestData["connote"]["organization_id"],
-                "location_id" => $requestData["location_id"],
-                "connote_total_package" => $requestData["connote"]["connote_total_package"],
-                "connote_surcharge_amount" => $requestData["connote"]["connote_surcharge_amount"],
-                "connote_sla_day" => $requestData["connote"]["connote_sla_day"],
-                "location_name" => $requestData["connote"]["location_name"],
-                "location_type" => $requestData["connote"]["location_type"],
-                "source_tariff_db" => $requestData["connote"]["source_tariff_db"],
-                "id_source_tariff" => $requestData["connote"]["id_source_tariff"],
-                "pod" => $requestData["connote"]["pod"],
-                "history" => $requestData["connote"]["history"],
-            ]);
-            $count = 0;
-            foreach ($requestData["koli_data"] as $key => $koli) {
-                $count++;
-                $this->koliRepository->store([
-                    "koli_length" => $koli["koli_length"],
-                    "awb_url" => $koli["awb_url"],
-                    "koli_chargeable_weight" => $koli["koli_chargeable_weight"],
-                    "koli_width" => $koli["koli_width"],
-                    "koli_surcharge" => $koli["koli_surcharge"],
-                    "koli_height" => $koli["koli_height"],
-                    "koli_description" => $koli["koli_description"],
-                    "koli_formula_id" => $koli["koli_formula_id"],
-                    "connote_id" => $connoteData->connote_id,
-                    "koli_volume" => $koli["koli_volume"],
-                    "koli_weight" => $koli["koli_weight"],
-                    "koli_custom_field" => $koli["koli_custom_field"],
-                    "koli_code" => $connoteData->connote_code.".$count",
-                ]);
-            }
-            return $packageData;
-        } catch (\Throwable $th) {
-            throw new Exception("failed inserting package:$th");
         }
+        return $packageData;
     }
 
     function getData(?int $offset, ?int $limit):Collection{
@@ -129,5 +125,9 @@ class PackageService
 
     function getByTransId(String $id):Package{
         return $this->packageRepository->getByTransId($id);
+    }
+
+    function deletePackage(String $id){
+        return $this->packageRepository->deleteByTransId($id);
     }
 }
