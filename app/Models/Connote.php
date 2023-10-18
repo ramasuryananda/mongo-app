@@ -13,11 +13,6 @@ class Connote extends Model
     protected $collection = "connotes";
     protected $primaryKey = "connote_id";
 
-    const STATE = [
-        0 => "PENDING",
-        1 => "FAILED",
-        2 => "PAID"
-    ];
 
     public $fillable = [
         "connote_number",

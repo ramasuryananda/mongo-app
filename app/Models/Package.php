@@ -14,8 +14,15 @@ class Package extends Model
     protected $collection = "packages";
     protected $primaryKey = "transaction_id";
 
+    const STATE = [
+        0 => "PENDING",
+        1 => "FAILED",
+        2 => "PAID"
+    ];
+
     public $fillable = [
         "customer_name",
+        "customer_code",
         "transaction_amount",
         "transaction_discount",
         "transaction_additional_field",

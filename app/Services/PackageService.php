@@ -14,6 +14,7 @@ use App\Http\Requests\StoreRequest;
 use App\Repository\ConnoteRepository;
 use App\Repository\PackageRepository;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 class PackageService
 {
@@ -43,6 +44,7 @@ class PackageService
 
             $packageData = $this->packageRepository->store([
                 "customer_name" => $requestData["customer_name"],
+                "customer_code" => $requestData["customer_code"],
                 "transaction_amount" => $requestData["transaction_amount"],
                 "transaction_discount" => $requestData["transaction_discount"],
                 "transaction_additional_field" => $requestData["transaction_additional_field"],
@@ -116,5 +118,12 @@ class PackageService
         } catch (\Throwable $th) {
             throw new Exception("failed inserting package:$th");
         }
+    }
+
+    function getData(?int $offset, ?int $limit):Collection{
+        return $this->packageRepository->getAll(
+            limit:$limit,
+            offset:$offset
+        );
     }
 }

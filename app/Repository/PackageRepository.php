@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRequest;
 use App\Models\Package;
 use App\Models\Packages;
 use Error;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class PackageRepository
@@ -14,6 +15,7 @@ class PackageRepository
     {
         $packageData = Package::create([
             "customer_name" => $data["customer_name"],
+            "customer_code" => $data["customer_code"],
             "transaction_amount" => $data["transaction_amount"],
             "transaction_discount" => $data["transaction_discount"],
             "transaction_additional_field" => $data["transaction_additional_field"],
@@ -33,6 +35,10 @@ class PackageRepository
             "currentLocation" => $data["currentLocation"],
         ]);
         return $packageData;
+    }
+
+    function getAll(?int $offset, ?int $limit):Collection{
+        return Package::with(["connote.koli"])->offset($offset)->limit($limit)->orderBy("created_at","DESC")->get();
     }
 
     function getCount():int
