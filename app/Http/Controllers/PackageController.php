@@ -7,7 +7,10 @@ use App\Http\Requests\StoreRequest;
 use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use App\Services\PackageService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Expr\Instanceof_;
 
 class PackageController extends Controller
 {
@@ -17,20 +20,52 @@ class PackageController extends Controller
         $this->service = $service;
     }
     function getPackage(GetDataRequest $request){
-        $request = $request->validated();
-        $data = PackageResource::collection($this->service->getData(
-            limit:$request["limit"],
-            offset: $request["offset"]
-        ));
+        try {
+            $request = $request->validated();
+                $data = PackageResource::collection($this->service->getData(
+                limit:$request["limit"],
+                offset: $request["offset"]
+            ));
 
-        $responseApi = [
-            'message'   => 'Success getting packages',
-            'data'      => $data,
-        ];
-        return response()->json($responseApi,Response::HTTP_OK);
+            $responseApi = [
+                'message'   => 'Success getting packages',
+                'data'      => $data,
+            ];
+            return response()->json($responseApi,Response::HTTP_OK);
+        } catch (\Throwable $th) {
+            Log::error("failed get data: $th->getMessage");
+            $responseApi = [
+                'message'   => 'Failed getting packages',
+                'error' => 'some error occurs.'
+            ];
+            return response()->json($responseApi,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     function getByTransId(String $id){
+        try {
+            $data = $this->service->getByTransId($id);
+
+            $responseApi = [
+                'message'   => 'Success getting package',
+                'data'      => (New PackageResource($data)),
+            ];
+            return response()->json($responseApi,Response::HTTP_OK);
+        }catch(ModelNotFoundException $e){
+            $responseApi = [
+                'message'   => 'Failed getting package',
+                'error' => 'Data not found'
+            ];
+            return response()->json($responseApi,Response::HTTP_NOT_FOUND);
+        } 
+        catch (\Throwable $th) {
+            Log::error("failed get data: $th->getMessage");
+            $responseApi = [
+                'message'   => 'Failed getting package',
+                'error' => 'Some error occurs.'
+            ];
+            return response()->json($responseApi,Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     function store(StoreRequest $request){
@@ -44,11 +79,11 @@ class PackageController extends Controller
         return response()->json($responseApi,Response::HTTP_CREATED);
     }
 
-    function update($request){
+    function update($request, String $id){
 
     }
 
-    function replace($request){
+    function replace($request, String $id){
         
     }
 

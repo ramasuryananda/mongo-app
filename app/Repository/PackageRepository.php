@@ -41,6 +41,10 @@ class PackageRepository
         return Package::with(["connote.koli"])->offset($offset)->limit($limit)->orderBy("created_at","DESC")->get();
     }
 
+    function getByTransId(String $id){
+        return Package::with(["connote.koli"])->findOrFail($id);
+    }
+
     function getCount():int
     {
         return Package::count();

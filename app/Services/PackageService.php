@@ -126,4 +126,8 @@ class PackageService
             offset:$offset
         );
     }
+
+    function getByTransId(String $id):Package{
+        return $this->packageRepository->getByTransId($id);
+    }
 }
