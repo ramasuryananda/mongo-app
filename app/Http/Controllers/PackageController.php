@@ -114,8 +114,31 @@ class PackageController extends Controller
         }
     }
 
-    public function replace($request, String $id){
-        
+    public function replace(StoreRequest $request, String $id){
+        try {
+            $data = (new PackageResource($this->service->replace($request->validated(),$id)));
+            return $this->responseSuccess(
+                message:'Success replacing package',
+                data:$data,
+                code:Response::HTTP_CREATED
+            );
+        } 
+        catch(ModelNotFoundException $e){
+            return $this->responseError(
+                message:"Failed replacing package",
+                error:"Package not found",
+                code:Response::HTTP_NOT_FOUND
+            );
+        } 
+        catch (\Throwable $th) {
+            $errorMessage = $th->getMessage();
+            Log::error("failed replace data: $errorMessage");
+            return $this->responseError(
+                message:"Failed replacing package",
+                error:"Some error occurs",
+                code:Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function delete(String $id){

@@ -42,6 +42,9 @@ class ConnoteRepository
         ]);
         return $connoteData;
     }
+    function deleteByTransId(String $transId){
+        return Connote::where("transaction_id",$transId)->delete();
+    }
 
     function updateFromTransaction(array $data, String $transactionId):bool{
         return Connote::where("transaction_id",$transactionId)->update([

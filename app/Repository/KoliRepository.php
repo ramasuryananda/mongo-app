@@ -27,4 +27,8 @@ class KoliRepository
         ]);
         return $connoteData;
     }
+
+    function deleteByConnoteId(String $connoteId){
+        return Koli::where("connote_id",$connoteId)->delete();
+    }
 }
