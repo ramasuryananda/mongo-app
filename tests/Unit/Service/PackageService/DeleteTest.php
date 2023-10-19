@@ -36,9 +36,10 @@ class DeleteTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_it_can_getData_package(): void
+    public function test_it_can_delete_package(): void
     {
-        $this->packageRepo->shouldReceive("delete");
+        $this->packageRepo->shouldReceive("deleteByTransId");
+        $this->service->deletePackage($this->package->transaction_id);
         $this->assertTrue(true);
     }
 }
