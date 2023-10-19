@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Unit\Repository\Package;
+namespace Tests\Unit\Repository\Package;
 
 use App\Models\Package;
 use App\Repository\PackageRepository;

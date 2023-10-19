@@ -16,6 +16,7 @@ class Package extends Model
     protected $connection = "mongodb";
     protected $collection = "packages";
     protected $primaryKey = "transaction_id";
+    protected $hidden = ['_id'];
 
     const STATE = [
         0 => "FAILED",

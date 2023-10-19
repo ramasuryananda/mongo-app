@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Unit\Service\PackageService;
+namespace Tests\Feature\Package;
 
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -11,17 +11,22 @@ use App\Services\PackageService;
 use App\Repository\ConnoteRepository;
 use App\Repository\KoliRepository;
 use App\Repository\PackageRepository;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Request as FacadesRequest;
 
-class StoreTest extends TestCase
+class ReplaceTest extends TestCase
 {
     use WithFaker;
     protected $service;
-    protected $packageRepo;
-    protected $connoteRepo;
-    protected $koliRepo;
+    protected $package;
+    protected $connote;
+    protected $koli;
+    protected $header;
     protected function setUp():void
     {
         parent::setUp();
@@ -29,11 +34,12 @@ class StoreTest extends TestCase
         Connote::truncate();
         Package::truncate();
 
-        $this->packageRepo = $this->mock(PackageRepository::class);
-        $this->connoteRepo = $this->mock(ConnoteRepository::class);
-        $this->koliRepo = $this->mock(KoliRepository::class);
+        $this->service = $this->mock(PackageService::class);
 
-        $this->service = $this->app->make(PackageService::class);
+        $this->header = [
+            'Content-type'  => 'application/json',
+            'Accept'        => 'application/json',
+        ];
     }
 
     private function createRequestData() : array
@@ -44,7 +50,7 @@ class StoreTest extends TestCase
             "transaction_amount" => 0,
             "transaction_discount" => 0,
             "transaction_additional_field" => null,
-            "transaction_payment_type" => fake()->text(),
+            "transaction_payment_type" => fake()->randomNumber(),
             "transaction_state" => fake()->numberBetween(0,3),
             "location_id" => fake()->text(),
             "organization_id" => fake()->numberBetween(),
@@ -121,11 +127,9 @@ class StoreTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_it_can_store_package(): void
+    public function test_it_can_replace_package(): void
     {
         $requestData = $this->createRequestData();
-
-        $this->packageRepo->shouldReceive("getCount")->andReturn(0);
         $packageData = Package::factory()->create([
             "customer_name" => $requestData["customer_name"],
             "customer_code" => $requestData["customer_code"],
@@ -193,15 +197,162 @@ class StoreTest extends TestCase
                 "koli_custom_field" => $koli["koli_custom_field"],
                 "koli_code" => $connoteData->connote_code.".1",
         ]);
+        $this->service->shouldReceive("replace")->andReturn($packageData);
 
-        $this->packageRepo->shouldReceive("store")->andReturn($packageData);
+        $url = route("replacePackage",$packageData->transaction_id);
+
+        $response = $this->putJson(data:$requestData,uri:$url,headers:$this->header);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'message',
+            'data' => [
+                'transaction_id',
+                'customer_name',
+                'customer_code',
+                'transaction_amount',
+                'transaction_discount',
+                'transaction_additional_field',
+                'transaction_payment_type',
+                'transaction_state',
+                'transaction_code',
+                'transaction_order',
+                'location_id',
+                'organization_id',
+                'created_at',
+                'updated_at',
+                'transaction_payment_type_name',
+                'transaction_cash_amount',
+                'transaction_cash_change',
+                'customer_attribute' => [
+                    "Nama_Sales",
+                    "TOP",
+                    "Jenis_Pelanggan"
+                ],
+                'connote' => [
+                    "connote_number",
+                    "connote_service",
+                    "connote_service_price",
+                    "connote_amount",
+                    "connote_code",
+                    "connote_booking_code",
+                    "connote_order",
+                    "connote_state_id",
+                    "zone_code_from",
+                    "zone_code_to",
+                    "surcharge_amount",
+                    "transaction_id",
+                    "actual_weight",
+                    "volume_weight",
+                    "chargeable_weight",
+                    "organization_id",
+                    "location_id",
+                    "connote_total_package",
+                    "connote_surcharge_amount",
+                    "connote_sla_day",
+                    "location_name",
+                    "location_type",
+                    "source_tariff_db",
+                    "id_source_tariff",
+                    "pod",
+                    "history",
+                    "connote_id",
+                    "updated_at",
+                    "created_at",
+                    "connote_state",
+                ],
+                'connote_id',
+                'origin_data' => [
+                    "customer_name",
+                    "customer_address",
+                    "customer_email",
+                    "customer_phone",
+                    "customer_zip_code",
+                    "zone_code",
+                    "customer_address_detail" ,
+                ],
+                'destination_data' => [
+                    "customer_name",
+                    "customer_address",
+                    "customer_email",
+                    "customer_phone",
+                    "customer_zip_code",
+                    "zone_code",
+                    "customer_address_detail" ,
+                ],
+                'koli_data' => [
+                    [
+                        "koli_length",
+                        "awb_url",
+                        "koli_chargeable_weight",
+                        "koli_width",
+                        "koli_surcharge",
+                        "koli_height",
+                        "koli_description",
+                        "koli_formula_id",
+                        "connote_id",
+                        "koli_volume",
+                        "koli_weight",
+                        "koli_custom_field",
+                        "koli_code",
+                        "koli_id",
+                        "updated_at",
+                        "created_at",
+                    ]
+                ],
+                'custom_field',
+                'current_location',
+            ]
+        ]);
+    }
+    /**
+     * A basic feature test example.
+     */
+    public function test_it_cannot_replace_package_if_validation_error(): void
+    {
+        $packageData = Package::factory()->create();
+        $requestData = $this->createRequestData();
+        unset($requestData["customer_name"]);
+
+
+        $response = $this->putJson(data:$requestData,uri:route('replacePackage',$packageData->transaction_id),headers:$this->header);
+
+        $response->assertUnprocessable();
+    }
+    /**
+     * A basic feature test example.
+     */
+    public function test_it_cannot_replace_package_if_some_error_occurs(): void
+    {
+        $packageData = Package::factory()->create();
+        $requestData = $this->createRequestData();
         
-        $this->connoteRepo->shouldReceive("store")->andReturn($connoteData);
-        $this->koliRepo->shouldReceive("store")->andReturn($koliData);
+        $this->service->shouldReceive("replace")->andThrow(new Exception("some error occurs"));
 
-        $data = $this->service->store($requestData);
-        $this->assertNotNull($data->transaction_id);
-        $this->assertNotNull($data->connote);
-        $this->assertNotNull($data->connote->koli);
+
+        $response = $this->putJson(data:$requestData,uri:route('replacePackage',$packageData->transaction_id),headers:$this->header);
+
+        $response->assertInternalServerError();
+        $response->assertJsonStructure([
+            'message',
+            'error' 
+        ]);
+    }
+    
+    public function test_it_cannot_replace_package_if_not_found(): void
+    {
+        $packageData = Package::factory()->create();
+        $requestData = $this->createRequestData();
+        
+        $this->service->shouldReceive("replace")->andThrow(ModelNotFoundException::class);
+
+
+        $response = $this->putJson(data:$requestData,uri:route('replacePackage',$packageData->transaction_id),headers:$this->header);
+
+        $response->assertNotFound();
+        $response->assertJsonStructure([
+            'message',
+            'error' 
+        ]);
     }
 }

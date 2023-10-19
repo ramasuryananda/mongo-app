@@ -15,6 +15,8 @@ class Connote extends Model
     protected $collection = "connotes";
     protected $primaryKey = "connote_id";
 
+    protected $hidden = ['_id'];
+
 
     public $fillable = [
         "connote_number",

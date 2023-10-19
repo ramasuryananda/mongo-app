@@ -20,10 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix("packages")->controller(PackageController::class)->group(function(){
-    Route::get("/","getPackage");
-    Route::get("/{id}","getByTransId");
-    Route::post("/","store");
-    Route::put("/{id}","replace");
-    Route::patch("/{id}","update");
-    Route::delete("/{id}","delete");
+    Route::get("/","getPackage")->name("getAllPackage");
+    Route::get("/{id}","getByTransId")->name("getPackageByID");
+    Route::post("/","store")->name("storePackage");
+    Route::put("/{id}","replace")->name("replacePackage");
+    Route::patch("/{id}","update")->name("patchPackage");
+    Route::delete("/{id}","delete")->name("deletePackage");
 });

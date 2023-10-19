@@ -16,6 +16,8 @@ class Koli extends EloquentModel
     protected $collection = "kolis";
     protected $primaryKey = "koli_id";
 
+    protected $hidden = ['_id'];
+
     public $fillable = [
         "koli_length",
         "awb_url",

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Unit\Repository\Connote;
+namespace Tests\Unit\Repository\Connote;
 
 use App\Models\Connote;
 use App\Models\Package;

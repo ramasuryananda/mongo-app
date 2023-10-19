@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Unit\Repository\Koli;
+namespace Tests\Unit\Repository\Koli;
 
 use App\Models\Connote;
 use App\Models\Koli;

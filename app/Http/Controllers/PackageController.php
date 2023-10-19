@@ -120,7 +120,7 @@ class PackageController extends Controller
             return $this->responseSuccess(
                 message:'Success replacing package',
                 data:$data,
-                code:Response::HTTP_CREATED
+                code:Response::HTTP_OK
             );
         } 
         catch(ModelNotFoundException $e){

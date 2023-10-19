@@ -18,6 +18,7 @@ class PackageResource extends JsonResource
 
         $connote = $this->connote;
         $connote->connote_state = Package::STATE[$connote->connote_state_id];
+        $connote = $connote->makeHidden(['koli']);
         return [
             'transaction_id' => $this->transaction_id,
             'customer_name' => $this->customer_name,
