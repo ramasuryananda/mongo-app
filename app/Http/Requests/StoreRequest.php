@@ -47,8 +47,6 @@ class StoreRequest extends FormRequest
             "connote.connote_service" => 'required|string',
             "connote.connote_booking_code" => 'nullable|string',
             "connote.connote_order" => 'required|numeric',
-            "connote.zone_code_from" => 'required|string',
-            "connote.zone_code_to" => 'required|string',
             "connote.surcharge_amount" => 'nullable|numeric',
             "connote.actual_weight" => 'required|numeric|min:0',
             "connote.volume_weight" => 'required|numeric|min:0',
