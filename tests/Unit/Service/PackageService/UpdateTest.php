@@ -31,7 +31,7 @@ class UpdateTest extends TestCase
 
         $this->package = Package::factory()->create();
         $this->connote = Connote::factory()->create([
-            "transaction_id" => $this->package->id
+            "transaction_id" => $this->package->transaction_id
         ]);
 
         $this->packageRepo = $this->mock(PackageRepository::class);

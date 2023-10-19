@@ -23,6 +23,7 @@ class ReplaceTest extends TestCase
     protected $connoteRepo;
     protected $koliRepo;
     protected $package;
+    protected $connote;
     protected function setUp():void
     {
         parent::setUp();
@@ -30,7 +31,10 @@ class ReplaceTest extends TestCase
         Connote::truncate();
         Package::truncate();
 
-        $this->package= Package::factory()->create();
+        $this->package = Package::factory()->create();
+        $this->connote = Connote::factory()->create([
+            "transaction_id" => $this->package->transaction_id
+        ]);
 
         $this->packageRepo = $this->mock(PackageRepository::class);
         $this->connoteRepo = $this->mock(ConnoteRepository::class);
@@ -48,7 +52,7 @@ class ReplaceTest extends TestCase
             "transaction_discount" => 0,
             "transaction_additional_field" => null,
             "transaction_payment_type" => fake()->text(),
-            "transaction_state" => fake()->numberBetween(0,3),
+            "transaction_state" => 3,
             "location_id" => fake()->text(),
             "organization_id" => fake()->numberBetween(),
             "transaction_payment_type_name" => fake()->text(),
@@ -150,7 +154,7 @@ class ReplaceTest extends TestCase
             "custom_field" => $requestData["custom_field"],
             "currentLocation" => $requestData["currentLocation"],
         ]);
-
+        $this->packageRepo->shouldReceive("getByTransId")->andReturn($this->package);
         $this->koliRepo->shouldReceive("deleteByConnoteId");
         $this->connoteRepo->shouldReceive("deleteByTransId");
 
@@ -200,12 +204,12 @@ class ReplaceTest extends TestCase
                 "koli_code" => $connoteData->connote_code.".1",
         ]);
 
-        $this->packageRepo->shouldReceive("store")->andReturn($packageData);
+        $this->packageRepo->shouldReceive("replace")->andReturn(true);
         
         $this->connoteRepo->shouldReceive("store")->andReturn($connoteData);
         $this->koliRepo->shouldReceive("store")->andReturn($koliData);
 
-        $data = $this->service->store($requestData);
+        $data = $this->service->replace($requestData,$this->package->transaction_id);
         $this->assertNotNull($data->transaction_id);
         $this->assertNotNull($data->connote);
         $this->assertNotNull($data->connote->koli);

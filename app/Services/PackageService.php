@@ -146,6 +146,7 @@ class PackageService
         ],$id);
 
         $packageData = $this->packageRepository->getByTransId($id);
+
         $this->koliRepository->deleteByConnoteId($packageData->connote->connote_id);
         $this->connoteRepository->deleteByTransId($packageData->transaction_id);
 
