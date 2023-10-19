@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Connote;
+use Database\Factories\PackageFactory;
 use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Package extends Model
 {
@@ -45,5 +48,10 @@ class Package extends Model
 
     public function connote(){
         return $this->hasOne(Connote::class,"transaction_id","transaction_id");
+    }
+
+    protected static function newFactory(): Factory
+    {
+        return PackageFactory::new();
     }
 }
