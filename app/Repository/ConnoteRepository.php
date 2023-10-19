@@ -24,6 +24,7 @@ class ConnoteRepository
             "connote_state_id" => $data["connote_state_id"],
             "zone_code_from" => $data["zone_code_from"],
             "zone_code_to" => $data["zone_code_to"],
+            "surcharge_amount" => $data["surcharge_amount"],
             "transaction_id" => $data["transaction_id"],
             "actual_weight" => $data["actual_weight"],
             "volume_weight" => $data["volume_weight"],

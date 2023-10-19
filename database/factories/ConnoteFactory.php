@@ -30,6 +30,7 @@ class ConnoteFactory extends Factory
             "connote_state_id" => fake()->numberBetween(0,3),
             "zone_code_from" => fake()->text(),
             "zone_code_to" => fake()->text(),
+            "surcharge_amount" => null,
             "transaction_id" => function () {
                 return Package::factory()->create()->transaction_id;
             },

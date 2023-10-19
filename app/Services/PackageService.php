@@ -77,6 +77,7 @@ class PackageService
             "connote_state_id" => $state,
             "zone_code_from" => $requestData["origin_data"]["zone_code"],
             "zone_code_to" => $requestData["destination_data"]["zone_code"],
+            "surcharge_amount" => $requestData["connote"]["surcharge_amount"],
             "transaction_id" => $packageData->transaction_id,
             "actual_weight" => $requestData["connote"]["actual_weight"],
             "volume_weight" => $requestData["connote"]["volume_weight"],
@@ -114,6 +115,7 @@ class PackageService
         }
         return $packageData;
     }
+    
     function replace(array $requestData, String $id): Package
     {
         $state = $requestData["transaction_state"];
@@ -161,6 +163,7 @@ class PackageService
             "connote_state_id" => $state,
             "zone_code_from" => $requestData["origin_data"]["zone_code"],
             "zone_code_to" => $requestData["destination_data"]["zone_code"],
+            "surcharge_amount" => $requestData["connote"]["surcharge_amount"],
             "transaction_id" => $packageData->transaction_id,
             "actual_weight" => $requestData["connote"]["actual_weight"],
             "volume_weight" => $requestData["connote"]["volume_weight"],

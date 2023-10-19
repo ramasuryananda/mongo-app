@@ -27,6 +27,7 @@ class Connote extends Model
         "connote_state_id",
         "zone_code_from",
         "zone_code_to",
+        "surcharge_amount",
         "transaction_id",
         "actual_weight",
         "volume_weight",
