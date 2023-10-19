@@ -232,6 +232,11 @@ class PackageService
     }
 
     function deletePackage(String $id){
+        $packageData = $this->packageRepository->getByTransId($id);
+        if($packageData->connote){
+            $this->koliRepository->deleteByConnoteId($packageData->connote->connote_id);
+            $this->connoteRepository->deleteByTransId($id);
+        }
         return $this->packageRepository->deleteByTransId($id);
     }
 }
