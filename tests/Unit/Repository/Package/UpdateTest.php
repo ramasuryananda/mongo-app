@@ -26,11 +26,11 @@ class UpdateTest extends TestCase
      */
     public function test_it_can_update_Package(): void
     {
-        $updateData = [[
+        $updateData = [
             "transaction_state" => fake()->numberBetween(0,3),
             "location_id" => fake()->text(),
-            "currentLocation" => fake()->array(),
-        ]];
+            "currentLocation" => null,
+        ];
         $this->repo->update($updateData,$this->package->transaction_id);
         $newData = $this->package->fresh();
 
