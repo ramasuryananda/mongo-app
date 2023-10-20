@@ -121,7 +121,6 @@ class PackageService
         $state = $requestData["transaction_state"];
 
         $orderCount = $this->packageRepository->getCount()+1;
-        $transactionCode = $requestData["origin_data"]["zone_code"].Carbon::now()->format("Ymd").$orderCount;
 
         $this->packageRepository->replace([
             "customer_name" => $requestData["customer_name"],
@@ -131,7 +130,6 @@ class PackageService
             "transaction_additional_field" => $requestData["transaction_additional_field"],
             "transaction_payment_type" => $requestData["transaction_payment_type"],
             "transaction_state" => $state,
-            "transaction_code" => $transactionCode,
             "transaction_order" => $orderCount,
             "location_id" => $requestData["location_id"],
             "organization_id" => $requestData["organization_id"],

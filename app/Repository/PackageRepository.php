@@ -47,7 +47,6 @@ class PackageRepository
             "transaction_additional_field" => $data["transaction_additional_field"],
             "transaction_payment_type" => $data["transaction_payment_type"],
             "transaction_state" => $data["transaction_state"],
-            "transaction_code" => $data["transaction_code"],
             "transaction_order" => $data["transaction_order"],
             "location_id" => $data["location_id"],
             "organization_id" => $data["organization_id"],

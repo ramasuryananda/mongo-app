@@ -17,8 +17,10 @@ class PackageResource extends JsonResource
     {
 
         $connote = $this->connote;
-        $connote->connote_state = Package::STATE[$connote->connote_state_id];
-        $connote = $connote->makeHidden(['koli']);
+        if($connote){
+            $connote->connote_state = Package::STATE[$connote->connote_state_id];
+            $connote = $connote->makeHidden(['koli']);
+        }
         return [
             'transaction_id' => $this->transaction_id,
             'customer_name' => $this->customer_name,
@@ -39,10 +41,10 @@ class PackageResource extends JsonResource
             'transaction_cash_change' => $this->transaction_cash_change,
             'customer_attribute' => $this->customer_attribute,
             'connote' => $connote,
-            'connote_id' => $connote->id,
+            'connote_id' => $connote ? $connote->id : "-",
             'origin_data' => $this->origin_data,
             'destination_data' => $this->destination_data,
-            'koli_data' => $this->connote->koli,
+            'koli_data' => $this->connote ? $this->connote->koli : null,
             'custom_field' => $this->custom_field,
             'current_location' => $this->current_location
         ];
